@@ -377,7 +377,7 @@
 \textbf{518021910971 裴奕博}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{184}{\boxspacing}
+\prompt{In}{incolor}{1}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
 \PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
@@ -391,7 +391,7 @@
 P}\label{pre-clear-data-and-calculate-r-and-p}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{210}{\boxspacing}
+\prompt{In}{incolor}{2}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{c+c1}{\PYZsh{} change data format}
 \PY{n}{df}\PY{o}{=}\PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}table}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Tpointer2Cam.txt}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{header}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}
@@ -408,7 +408,7 @@ P}\label{pre-clear-data-and-calculate-r-and-p}}
 \end{tcolorbox}
 
             \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
-\prompt{Out}{outcolor}{210}{\boxspacing}
+\prompt{Out}{outcolor}{2}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
                                                   Ri    Pi
 0  [[-0.940318, 0.00452241, 0.339885, 24.7], [-0{\ldots}  None
@@ -420,38 +420,46 @@ P}\label{pre-clear-data-and-calculate-r-and-p}}
 \end{tcolorbox}
         
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{209}{\boxspacing}
+\prompt{In}{incolor}{3}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{c+c1}{\PYZsh{} split Ri and Pi}
 \PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{=}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{apply}\PY{p}{(}\PY{k}{lambda} \PY{n}{x}\PY{p}{:}\PY{n}{np}\PY{o}{.}\PY{n}{hsplit}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{3}\PY{p}{]}\PY{p}{)}\PY{p}{)}\PY{p}{)}
 \PY{n}{df}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Pi}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{=}\PY{n}{df}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{apply}\PY{p}{(}\PY{k}{lambda} \PY{n}{x}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{n}{x}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
 \PY{n}{df}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{=}\PY{n}{df}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{apply}\PY{p}{(}\PY{k}{lambda} \PY{n}{x}\PY{p}{:}\PY{n}{x}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
-\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{=}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{apply}\PY{p}{(}\PY{k}{lambda} \PY{n}{x}\PY{p}{:}\PY{n}{np}\PY{o}{.}\PY{n}{concatenate}\PY{p}{(}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{np}\PY{o}{.}\PY{n}{identity}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{)}\PY{p}{)}\PY{p}{,}\PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{neg}\PY{o}{=}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{identity}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{neg}\PY{p}{)}
+\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{=}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{apply}\PY{p}{(}\PY{k}{lambda} \PY{n}{x}\PY{p}{:}\PY{n}{np}\PY{o}{.}\PY{n}{concatenate}\PY{p}{(}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{neg}\PY{p}{)}\PY{p}{,}\PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
 \PY{n}{df}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{5}\PY{p}{)}
 \end{Verbatim}
 \end{tcolorbox}
 
+    \begin{Verbatim}[commandchars=\\\{\}]
+[[-1. -0. -0.]
+ [-0. -1. -0.]
+ [-0. -0. -1.]]
+    \end{Verbatim}
+
             \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
-\prompt{Out}{outcolor}{209}{\boxspacing}
+\prompt{Out}{outcolor}{3}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
                                                   Ri  \textbackslash{}
-0  [[-0.940318, 0.00452241, 0.339885, 1.0, 0.0, 0{\ldots}
-1  [[-0.94146, 0.0032108, 0.336806, 1.0, 0.0, 0.0{\ldots}
-2  [[-0.941584, 0.00107668, 0.336133, 1.0, 0.0, 0{\ldots}
-3  [[-0.941101, 0.00197468, 0.337541, 1.0, 0.0, 0{\ldots}
-4  [[-0.940003, 0.0029642, 0.340505, 1.0, 0.0, 0{\ldots}
+0  [[-0.940318, 0.00452241, 0.339885, -1.0, -0.0,{\ldots}
+1  [[-0.94146, 0.0032108, 0.336806, -1.0, -0.0, -{\ldots}
+2  [[-0.941584, 0.00107668, 0.336133, -1.0, -0.0,{\ldots}
+3  [[-0.941101, 0.00197468, 0.337541, -1.0, -0.0,{\ldots}
+4  [[-0.940003, 0.0029642, 0.340505, -1.0, -0.0, {\ldots}
 
-                                                  Pi
-0  [[-1.0, -0.0, -0.0], [-0.0, -1.0, -0.0], [-0.0{\ldots}
-1  [[-1.0, -0.0, -0.0], [-0.0, -1.0, -0.0], [-0.0{\ldots}
-2  [[-1.0, -0.0, -0.0], [-0.0, -1.0, -0.0], [-0.0{\ldots}
-3  [[-1.0, -0.0, -0.0], [-0.0, -1.0, -0.0], [-0.0{\ldots}
-4  [[-1.0, -0.0, -0.0], [-0.0, -1.0, -0.0], [-0.0{\ldots}
+                                Pi
+0    [[-24.7], [121.7], [1551.76]]
+1    [[-24.8], [122.14], [1551.4]]
+2  [[-24.86], [122.59], [1551.23]]
+3  [[-24.81], [122.44], [1551.43]]
+4  [[-24.68], [122.16], [1552.08]]
 \end{Verbatim}
 \end{tcolorbox}
         
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{206}{\boxspacing}
+\prompt{In}{incolor}{4}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{c+c1}{\PYZsh{} conatenate matrix}
 \PY{n}{Ri\PYZus{}matrix}\PY{o}{=}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Ri}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
@@ -493,7 +501,7 @@ p_{p}
 \]
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{190}{\boxspacing}
+\prompt{In}{incolor}{5}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{n}{result} \PY{o}{=} \PY{n}{lstsq}\PY{p}{(}\PY{n}{Ri\PYZus{}matrix}\PY{p}{,}\PY{n}{Pi\PYZus{}matrix}\PY{p}{)}
 \PY{n}{result}
@@ -501,14 +509,14 @@ p_{p}
 \end{tcolorbox}
 
             \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
-\prompt{Out}{outcolor}{190}{\boxspacing}
+\prompt{Out}{outcolor}{5}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 (array([[ 2.08418195e+02],
         [-6.43296344e-01],
         [-3.31314000e+01],
-        [ 1.82426929e+02],
-        [ 1.33443408e+02],
-        [ 1.51384362e+03]]),
+        [-1.82426929e+02],
+        [-1.33443408e+02],
+        [-1.51384362e+03]]),
  array([52.0256386]),
  6,
  array([22.53733552, 22.46134983, 22.31442892,  4.47201692,  3.66339155,
@@ -517,7 +525,7 @@ p_{p}
 \end{tcolorbox}
         
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{191}{\boxspacing}
+\prompt{In}{incolor}{6}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{n}{tmp}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{split}\PY{p}{(}\PY{n}{result}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{)}
 \PY{n}{pt}\PY{o}{=}\PY{n}{tmp}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
@@ -529,7 +537,7 @@ p_{p}
 
     \begin{Verbatim}[commandchars=\\\{\}]
 pt= [208.41819488  -0.64329634 -33.13140004]
-pp= [ 182.42692914  133.44340751 1513.84362071]
+pp= [ -182.42692914  -133.44340751 -1513.84362071]
     \end{Verbatim}
 
     \hypertarget{further-compute-the-root-mean-square-errors-of-the-tip-calibration}{%
@@ -538,7 +546,7 @@ tip
 calibration}\label{further-compute-the-root-mean-square-errors-of-the-tip-calibration}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{207}{\boxspacing}
+\prompt{In}{incolor}{7}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{n}{residual}\PY{o}{=}\PY{n}{Pi\PYZus{}matrix}\PY{o}{\PYZhy{}}\PY{n}{np}\PY{o}{.}\PY{n}{dot}\PY{p}{(}\PY{n}{Ri\PYZus{}matrix}\PY{p}{,}\PY{n}{result}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
 \PY{n}{error}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{sqrt}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{square}\PY{p}{(}\PY{n}{residual}\PY{p}{)}\PY{p}{)}\PY{o}{/}\PY{n}{num}\PY{o}{/}\PY{l+m+mi}{3}\PY{p}{)}
@@ -547,19 +555,12 @@ calibration}\label{further-compute-the-root-mean-square-errors-of-the-tip-calibr
 \end{tcolorbox}
 
             \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
-\prompt{Out}{outcolor}{207}{\boxspacing}
+\prompt{Out}{outcolor}{7}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 0.2587606303880167
 \end{Verbatim}
 \end{tcolorbox}
         
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{ }{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-
-\end{Verbatim}
-\end{tcolorbox}
-
 
     % Add a bibliography block to the postdoc
     
