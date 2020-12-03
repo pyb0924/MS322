@@ -53,8 +53,12 @@ docs/
 toolbox_general/
 toolbox_signal/
 data/
+raw_data/
+train_data/
 tensorboard/
 demo/
+
+
 # READ THIS BEFORE YOU REFACTOR ME
 #
 # setup.py uses the list of patterns in this file to decide

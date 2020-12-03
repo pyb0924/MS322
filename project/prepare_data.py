@@ -1,7 +1,7 @@
 from pathlib import Path
 
-original_path = Path('root/datasets/instrument_segmentation/endovis2017')
-des_path = Path('root/pyb/data')
+original_path = Path('raw_data')
+des_path = Path('train_data')
 
 folder = 'instrument_dataset_'
 
@@ -17,5 +17,3 @@ if __name__ == '__main__':
         parts_mask_folder.mkdir(exist_ok=True, parents=True)
         instrument_mask_folder = instrument_folder / 'instruments_masks'
         instrument_mask_folder.mkdir(exist_ok=True, parents=True)
-
-
