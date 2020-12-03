@@ -1,16 +1,19 @@
-# This is a sample Python script.
+from my_dataloader import load_image, load_mask
+import numpy as np
+import matplotlib.pyplot as plt
+import torchvision
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    train_image_list, val_image_list = get_file_name()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    img_name = str(train_image_list[0])
+    mask_name = img_name.replace('images', 'binary_masks')
+    mask_name = mask_name.replace('jpg', 'png')
+    img = load_image(img_name)
+    print(mask_name)
+    mask = load_mask(mask_name)
+
+    plt.imshow(img, cmap='gray')
+    plt.savefig('img.png')
+    plt.imshow(mask, cmap='gray')
+    plt.savefig('mask.png')
