@@ -1,7 +1,5 @@
-from my_dataloader import load_image, load_mask
-import numpy as np
+from test.my_dataloader import load_image, load_mask
 import matplotlib.pyplot as plt
-import torchvision
 
 if __name__ == '__main__':
     train_image_list, val_image_list = get_file_name()
