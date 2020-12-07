@@ -1,4 +1,4 @@
-from test.my_dataloader import load_image, load_mask
+from json_to_csv.my_dataloader import load_image, load_mask
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':

@@ -20,7 +20,7 @@ class LossBinary:
         if self.jaccard_weight:
             eps = 1e-15
             jaccard_target = (targets == 1).float()
-            jaccard_output = F.sigmoid(outputs)
+            jaccard_output = torch.sigmoid(outputs)
 
             intersection = (jaccard_output * jaccard_target).sum()
             union = jaccard_output.sum() + jaccard_target.sum()
@@ -36,7 +36,7 @@ class LossMulti:
                 torch.from_numpy(class_weights.astype(np.float32)))
         else:
             nll_weight = None
-        self.nll_loss = nn.NLLLoss2d(weight=nll_weight)
+        self.nll_loss = nn.NLLLoss(weight=nll_weight)
         self.jaccard_weight = jaccard_weight
         self.num_classes = num_classes
 

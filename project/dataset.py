@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import cv2
 from torch.utils.data import Dataset
-from test import prepare_data
+import prepare_data
 from albumentations.pytorch.functional import img_to_tensor
 
 

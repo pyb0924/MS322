@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-
+import torch.nn.functional as F
 import random
 import numpy as np
 
@@ -11,6 +11,21 @@ import tqdm
 
 def cuda(x):
     return x.cuda() if torch.cuda.is_available() else x
+
+
+def write_result(args, **data):
+    data['model'] = args.model
+    data['dt'] = datetime.now().isoformat()
+    data['batch-size'] = args.batch_size
+    data['n_epochs'] = args.n_epochs
+    data['dir'] = args.root
+    data['problem-type'] = args.type
+    data['fold'] = args.fold
+    with open('result.json', 'r+', encoding='utf-8') as f:
+        prev = json.load(f)
+        f.seek(0, 0)
+        prev.append(data)
+        json.dump(prev, f, ensure_ascii=False, indent=4, sort_keys=True)
 
 
 def write_event(log, step, **data):
@@ -35,10 +50,10 @@ def check_crop_size(image_height, image_width):
     return image_height % 32 == 0 and image_width % 32 == 0
 
 
-def train(args, model, criterion, train_loader, valid_loader, validation, init_optimizer, n_epochs=None, fold=None,
-          num_classes=None):
+def train(args, model, criterion, train_loader, valid_loader, validation, init_optimizer, fold=None,
+          num_classes=None, weights=None):
     lr = args.lr
-    n_epochs = n_epochs or args.n_epochs
+    n_epochs = args.n_epochs
     optimizer = init_optimizer(lr)
 
     root = Path(args.root)
@@ -69,11 +84,13 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
         tq.set_description('Epoch {}, lr {}'.format(epoch, lr))
         losses = []
         tl = train_loader
+
         try:
             mean_loss = 0
-            for i, (inputs, targets) in enumerate(tl):
-                inputs = cuda(inputs)
 
+            for i, (inputs, targets) in enumerate(tl):
+
+                inputs = cuda(inputs)
                 with torch.no_grad():
                     targets = cuda(targets)
 
@@ -90,6 +107,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
                 tq.set_postfix(loss='{:.5f}'.format(mean_loss))
                 if i and i % report_each == 0:
                     write_event(log, step, loss=mean_loss)
+
             write_event(log, step, loss=mean_loss)
             tq.close()
             save(epoch + 1)
@@ -103,3 +121,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
             save(epoch)
             print('done.')
             return
+
+    if args.ends_flag:
+        valid_metrics = validation(model, criterion, valid_loader, num_classes)
+        write_result(args, **valid_metrics)

@@ -45,6 +45,7 @@ if __name__ == '__main__':
             old_h, old_w, _ = img.shape
 
             img = img[h_start: h_start + height, w_start: w_start + width]
+            img=cv2.resize(img,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
             cv2.imwrite(str(cropped_train_path / instrument_folder / 'images' / (file_name.stem + '.jpg')), img,
                         [cv2.IMWRITE_JPEG_QUALITY, 100])
 
@@ -79,10 +80,13 @@ if __name__ == '__main__':
 
             mask_binary = (mask_binary[h_start: h_start + height, w_start: w_start + width] > 0).astype(
                 np.uint8) * binary_factor
+            mask_binary=cv2.resize(mask_binary,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
             mask_parts = (mask_parts[h_start: h_start + height, w_start: w_start + width]).astype(
                 np.uint8) * parts_factor
+            mask_parts = cv2.resize(mask_parts, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
             mask_instruments = (mask_instruments[h_start: h_start + height, w_start: w_start + width]).astype(
                 np.uint8) * instrument_factor
+            mask_instruments = cv2.resize(mask_instruments, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 
             cv2.imwrite(str(binary_mask_folder / file_name.name), mask_binary)
             cv2.imwrite(str(parts_mask_folder / file_name.name), mask_parts)
