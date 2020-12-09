@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
 import torch.backends.cudnn
 
-from models import UNet11, LinkNet34, UNet, UNet16, AlbuNet
+from models.models import UNet11, LinkNet34, UNet, UNet16, AlbuNet, TDSNet
 from loss import LossBinary, LossMulti
 from dataset import RoboticsDataset
 import utils
@@ -31,7 +31,9 @@ moddel_list = {'UNet11': UNet11,
                'UNet16': UNet16,
                'UNet': UNet,
                'AlbuNet': AlbuNet,
-               'LinkNet34': LinkNet34}
+               'LinkNet34': LinkNet34,
+               'TDSNet': TDSNet
+               }
 
 
 def main():
@@ -51,7 +53,7 @@ def main():
     arg('--val_crop_width', type=int, default=640)
     arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments'])
     arg('--model', type=str, default='UNet', choices=moddel_list.keys())
-    arg('--ends-flag',type=int,default=0)
+    arg('--ends-flag', type=int, default=0)
 
     args = parser.parse_args()
 
@@ -110,7 +112,8 @@ def main():
 
     train_file_names, val_file_names = get_split(args.fold)
 
-    print('num train = {}, num_val = {}, model={}, type={}, fold={}'.format(len(train_file_names), len(val_file_names),args.model,args.type,args.fold))
+    print('num train = {}, num_val = {}, model={}, type={}, fold={}'.format(len(train_file_names), len(val_file_names),
+                                                                            args.model, args.type, args.fold))
 
     def train_transform(p=1):
         return Compose([

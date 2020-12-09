@@ -3,6 +3,7 @@ import torch
 from torchvision import models
 import torchvision
 from torch.nn import functional as F
+from functools import partial
 
 
 def conv3x3(in_, out):
@@ -462,6 +463,58 @@ class AlbuNet(nn.Module):
         return x_out
 
 
+nonlinearity = partial(F.relu, inplace=True)
+
+
+class CEBlock(nn.Module):
+    """
+    Our proposed context ensemble module. By coupling each pair of the decomposed tasks, the receptive fields
+    enlarge their sizes, through the stacked dilated convolution with the dilated rates 1, 2, 4, 8, 16 in, respectively.
+    In the output of the module, the task-task CE modules are further paralleled which could obtain features with
+    dilated rates 1, 3, 7, 15, 31, 63.
+
+    Attributes:
+        out0_1: segment, class branch sharing
+        out0_2: segment, scene branch sharing
+        out1_2: scene, class branch sharing
+    """
+
+    def __init__(self, channel):
+        super(CEBlock, self).__init__()
+
+        self.dilate0 = nn.ConvTranspose2d(channel, 256, kernel_size=4, stride=2, padding=1)
+        self.dilate1 = nn.Conv2d(256, 256, kernel_size=3, dilation=1, padding=1)
+        self.dilate2 = nn.Conv2d(256, 256, kernel_size=3, dilation=2, padding=2)
+        self.dilate4 = nn.Conv2d(256, 256, kernel_size=3, dilation=4, padding=4)
+        self.dilate8 = nn.Conv2d(256, 256, kernel_size=3, dilation=8, padding=8)
+        self.dilate16 = nn.Conv2d(256, 256, kernel_size=3, dilation=16, padding=16)
+
+        self.task0_1 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+        self.task0_2 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+        self.task1_2 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+                if m.bias is not None:
+                    m.bias.data.zero_()
+
+    def forward(self, x):
+
+        x = nonlinearity(self.dilate0(x))
+        dilate1_out = nonlinearity(self.dilate1(x))
+        dilate2_out = nonlinearity(self.dilate2(dilate1_out))
+        dilate3_out = nonlinearity(self.dilate4(dilate2_out))
+        dilate4_out = nonlinearity(self.dilate8(dilate3_out))
+        dilate5_out = nonlinearity(self.dilate16(dilate4_out))
+
+        latent = x + dilate1_out + dilate2_out + dilate3_out + dilate4_out + dilate5_out
+        out0_1 = nonlinearity(self.task0_1(latent))
+        out0_2 = nonlinearity(self.task0_2(latent))
+        out1_2 = nonlinearity(self.task1_2(latent))
+
+        return out0_1, out0_2, out1_2
+
+
 class TDSNet(nn.Module):
     """
     The image is processed through the encoder and task-task context ensemble to arrive at the latent space.
@@ -563,5 +616,4 @@ class TDSNet(nn.Module):
             out_seg = self.final(dec0)
 
         return out_seg, out_class, out_scene
-
 
