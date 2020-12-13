@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-import torch.nn.functional as F
+import matplotlib.pyplot as plt
 import random
 import numpy as np
 
@@ -107,6 +107,19 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
                 tq.set_postfix(loss='{:.5f}'.format(mean_loss))
                 if i and i % report_each == 0:
                     write_event(log, step, loss=mean_loss)
+
+            input_classes=inputs.data.cpu().numpy()
+            output_classes = outputs.data.cpu().numpy().argmax(axis=1)
+            target_classes = targets.data.cpu().numpy()
+            plt.figure()
+            plt.subplot(131)
+            plt.imshow(output_classes[0], cmap='gray')
+            plt.subplot(132)
+            plt.imshow(target_classes[0], cmap='gray')
+            plt.subplot(133)
+            plt.imshow(input_classes[0][0],cmap='gray')
+            plt.show()
+            plt.savefig('1.png')
 
             write_event(log, step, loss=mean_loss)
             tq.close()

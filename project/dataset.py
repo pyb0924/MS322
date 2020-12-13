@@ -20,19 +20,29 @@ class RoboticsDataset(Dataset):
     def __getitem__(self, idx):
         img_file_name = self.file_names[idx]
         image = load_image(img_file_name)
-        mask = load_mask(img_file_name, self.problem_type)
-
-        data = {"image": image, "mask": mask}
-        augmented = self.transform(**data)
-        image, mask = augmented["image"], augmented["mask"]
+        if self.problem_type == 'all':
+            mask_binary, mask_parts, mask_instruments = load_all_mask(img_file_name)
+            data = {"image": image, "mask_binary": mask_binary, "mask_parts": mask_parts,
+                    "mask_instruments": mask_instruments}
+            augmented = self.transform(**data)
+            image, mask_binary, mask_parts, mask_instruments = augmented["image"], augmented["mask_binary"], augmented[
+                "mask_parts"], augmented["mask_instruments"]
+        else:
+            mask = load_mask(img_file_name, self.problem_type)
+            data = {"image": image, "mask": mask}
+            augmented = self.transform(**data)
+            image, mask = augmented["image"], augmented["mask"]
 
         if self.mode == 'train':
             if self.problem_type == 'binary':
                 return img_to_tensor(image), torch.from_numpy(np.expand_dims(mask, 0)).float()
+            elif self.problem_type == 'all':
+                img_to_tensor(image), torch.from_numpy(mask_binary).long(), torch.from_numpy(
+                    mask_parts).long(), torch.from_numpy(mask_instruments).long()
             else:
                 return img_to_tensor(image), torch.from_numpy(mask).long()
-        else:
-            return img_to_tensor(image), str(img_file_name)
+        # else:
+        # return img_to_tensor(image), str(img_file_name)
 
 
 def load_image(path):
@@ -54,3 +64,10 @@ def load_mask(path, problem_type):
     mask = cv2.imread(str(path).replace('images', mask_folder).replace('jpg', 'png'), 0)
 
     return (mask / factor).astype(np.uint8)
+
+
+def load_all_mask(path):
+    mask1 = load_mask(path, 'binary')
+    mask2 = load_mask(path, 'parts')
+    mask3 = load_mask(path, 'instruments')
+    return mask1, mask2, mask3

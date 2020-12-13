@@ -1,7 +1,8 @@
 import argparse
 import json
 from pathlib import Path
-from validation import validation_binary, validation_multi
+from validation import validation_binary, validation_multi, validation_all
+import numpy as np
 
 import torch
 from torch import nn
@@ -11,7 +12,7 @@ import torch.backends.cudnn as cudnn
 import torch.backends.cudnn
 
 from models.models import UNet11, LinkNet34, UNet, UNet16, AlbuNet, TDSNet
-from loss import LossBinary, LossMulti
+from loss import LossBinary, LossMulti, LossAll
 from dataset import RoboticsDataset
 import utils
 import sys
@@ -39,21 +40,24 @@ moddel_list = {'UNet11': UNet11,
 def main():
     parser = argparse.ArgumentParser()
     arg = parser.add_argument
-    arg('--jaccard-weight', default=0.3, type=float)
+    arg('--jaccard-weight', default=0.7, type=float)
     arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs')
     arg('--fold', type=int, help='fold', default=0)
-    arg('--root', default='runs/debug', help='checkpoint root')
+    arg('--root', default='runs/debug2', help='checkpoint root')
     arg('--batch-size', type=int, default=16)
     arg('--n-epochs', type=int, default=100)
-    arg('--lr', type=float, default=0.0001)
+    arg('--lr', type=float, default=0.000001)
     arg('--workers', type=int, default=2)
     arg('--train_crop_height', type=int, default=512)
     arg('--train_crop_width', type=int, default=640)
     arg('--val_crop_height', type=int, default=512)
     arg('--val_crop_width', type=int, default=640)
-    arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments'])
+    arg('--type', type=str, default='instruments', choices=['binary', 'parts', 'instruments', 'all'])
     arg('--model', type=str, default='UNet', choices=moddel_list.keys())
     arg('--ends-flag', type=int, default=0)
+    arg('--alpha', default=0.2, type=float)
+    arg('--beta', default=0.4, type=float)
+    arg('--gamma', default=0.2, type=float)
 
     args = parser.parse_args()
 
@@ -74,13 +78,15 @@ def main():
 
     if args.type == 'parts':
         num_classes = 4
-    elif args.type == 'instruments':
-        num_classes = 8
-    else:
+    elif args.type == 'binary':
         num_classes = 1
+    else:
+        num_classes = 8
 
     if args.model == 'UNet':
         model = UNet(num_classes=num_classes)
+    elif args.type == 'all':
+        model = TDSNet(num_classes=num_classes)
     else:
         model_name = moddel_list[args.model]
         model = model_name(num_classes=num_classes, pretrained=True)
@@ -96,8 +102,15 @@ def main():
 
     if args.type == 'binary':
         loss = LossBinary(jaccard_weight=args.jaccard_weight)
-    else:
+    elif args.type == 'parts':
         loss = LossMulti(num_classes=num_classes, jaccard_weight=args.jaccard_weight)
+    elif args.type == 'instruments':
+        class_weight = np.array([0.1, 0.05, 0.05, 0.2, 0.2, 0.2, 0.1, 0.1], dtype=np.float32)
+        loss = LossMulti(num_classes=num_classes, jaccard_weight=args.jaccard_weight, class_weights=class_weight)
+    elif args.type == 'all':
+        class_weight = np.array([0.1, 0.05, 0.05, 0.2, 0.2, 0.2, 0.1, 0.1], dtype=np.float32)
+        loss = LossAll(args.alpha, args.beta, args.gamma, num_classes=num_classes, jaccard_weight=args.jaccard_weight,
+                       class_weights=class_weight)
 
     cudnn.benchmark = True
 
@@ -141,6 +154,8 @@ def main():
 
     if args.type == 'binary':
         valid = validation_binary
+    elif args.type == 'all':
+        valid = validation_all
     else:
         valid = validation_multi
 

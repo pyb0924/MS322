@@ -15,3 +15,7 @@
 - 在此基础上复现MF-TAPNet和TDSNet
 - 结合MF-TAPNet和TDSNet
 - 报告和文字材料撰写
+
+## 存在的问题
+- type=binary时iou和dice不显示
+- type=instrument时iou值只有论文结果约一半。
