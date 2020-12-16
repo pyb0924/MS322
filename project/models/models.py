@@ -534,7 +534,6 @@ class TDSNet(nn.Module):
     """
 
     def __init__(self, num_classes=1, num_scenes=1, num_filters=32, pretrained=False):
-
         super().__init__()
         self.num_classes = num_classes
 
@@ -576,20 +575,19 @@ class TDSNet(nn.Module):
 
         self.center = CEBlock(512)
 
-        self.fc_scene = nn.Linear(512, 256)
-        self.fc_scene_out = nn.Linear(256, num_scenes)
-        self.avgpool_scene = nn.AdaptiveAvgPool2d(1)
+        self.dec11 = DecoderBlock(512, 64, 32)
+        self.dec12 = ConvRelu(32, 32)
+        self.final1 = nn.Conv2d(32, 1, kernel_size=1)
 
-        self.fc_class = nn.Linear(512, 256)
-        self.fc_class_out = nn.Linear(256, num_classes)
-        self.avgpool_class = nn.AdaptiveAvgPool2d(1)
+        self.dec21 = DecoderBlock(512, 64, 32)
+        self.dec22 = ConvRelu(32, 32)
+        self.final2 = nn.Conv2d(32, 4, kernel_size=1)
 
-        self.dec1 = DecoderBlock(512, 64, 32)
-        self.dec0 = ConvRelu(32, 32)
-        self.final = nn.Conv2d(32, num_classes, kernel_size=1)
+        self.dec31 = DecoderBlock(512, 64, 32)
+        self.dec32 = ConvRelu(32, 32)
+        self.final3 = nn.Conv2d(32, 8, kernel_size=1)
 
     def forward(self, x):
-
         conv1 = self.conv1(x)
         conv2 = self.conv2(self.pool(conv1))
         conv3 = self.conv3(self.pool(conv2))
@@ -598,22 +596,16 @@ class TDSNet(nn.Module):
 
         center0_1, center0_2, center1_2 = self.center(self.pool(conv5))
 
-        x = self.avgpool_class(torch.cat([center0_1, center1_2], 1))
-        x = x.view(x.size(0), -1)
-        out_class = self.fc_class(x)
-        out_class = self.fc_class_out(out_class)
+        dec1 = self.dec11(torch.cat([center0_1, center0_2], 1))
+        dec1 = self.dec12(dec1)
+        out_binary = F.log_softmax(self.final1(dec1),dim=1)
 
-        x = self.avgpool_scene(torch.cat([center0_2, center1_2], 1))
-        x = x.view(x.size(0), -1)
-        out_scene = self.fc_scene(x)
-        out_scene = self.fc_scene_out(out_scene)
+        dec2 = self.dec21(torch.cat([center0_1, center1_2], 1))
+        dec2 = self.dec22(dec2)
+        out_parts = F.log_softmax(self.final2(dec2), dim=1)
 
-        dec1 = self.dec1(torch.cat([center0_1, center0_2], 1))
-        dec0 = self.dec0(dec1)
-        if self.num_classes > 1:
-            out_seg = F.log_softmax(self.final(dec0), dim=1)
-        else:
-            out_seg = self.final(dec0)
+        dec3 = self.dec31(torch.cat([center0_2, center1_2], 1))
+        dec3 = self.dec32(dec3)
+        out_instruments = F.log_softmax(self.final3(dec3), dim=1)
 
-        return out_seg, out_class, out_scene
-
+        return out_binary, out_parts, out_instruments

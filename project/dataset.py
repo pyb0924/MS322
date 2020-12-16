@@ -37,7 +37,7 @@ class RoboticsDataset(Dataset):
             if self.problem_type == 'binary':
                 return img_to_tensor(image), torch.from_numpy(np.expand_dims(mask, 0)).float()
             elif self.problem_type == 'all':
-                img_to_tensor(image), torch.from_numpy(mask_binary).long(), torch.from_numpy(
+                return img_to_tensor(image), torch.from_numpy(mask_binary).long(), torch.from_numpy(
                     mask_parts).long(), torch.from_numpy(mask_instruments).long()
             else:
                 return img_to_tensor(image), torch.from_numpy(mask).long()

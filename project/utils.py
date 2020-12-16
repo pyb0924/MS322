@@ -87,39 +87,62 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
 
         try:
             mean_loss = 0
+            if args.type=='all':
+                for i, (inputs, targets_binary,targets_parts,targets_instruments) in enumerate(tl):
 
-            for i, (inputs, targets) in enumerate(tl):
+                    inputs = cuda(inputs)
+                    with torch.no_grad():
+                        targets_binary = cuda(targets_binary)
+                        targets_parts=cuda(targets_parts)
+                        targets_instruments=cuda(targets_instruments)
+                    outputs_binary,outputs_parts,outputs_instruments = model(inputs)
+                    print(outputs_binary.shape,targets_binary.shape)
+                    loss = criterion(outputs_binary, targets_binary,outputs_parts,targets_parts,outputs_instruments,targets_instruments)
+                    optimizer.zero_grad()
+                    batch_size = inputs.size(0)
+                    loss.backward()
+                    optimizer.step()
+                    step += 1
+                    tq.update(batch_size)
+                    losses.append(loss.item())
+                    mean_loss = np.mean(losses[-report_each:])
+                    tq.set_postfix(loss='{:.5f}'.format(mean_loss))
+                    if i and i % report_each == 0:
+                        write_event(log, step, loss=mean_loss)
+            else:
+                for i, (inputs, targets) in enumerate(tl):
 
-                inputs = cuda(inputs)
-                with torch.no_grad():
-                    targets = cuda(targets)
+                    inputs = cuda(inputs)
+                    with torch.no_grad():
+                        targets = cuda(targets)
 
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                optimizer.zero_grad()
-                batch_size = inputs.size(0)
-                loss.backward()
-                optimizer.step()
-                step += 1
-                tq.update(batch_size)
-                losses.append(loss.item())
-                mean_loss = np.mean(losses[-report_each:])
-                tq.set_postfix(loss='{:.5f}'.format(mean_loss))
-                if i and i % report_each == 0:
-                    write_event(log, step, loss=mean_loss)
+                    outputs = model(inputs)
+                    print(outputs.shape,targets.shape)
+                    loss = criterion(outputs, targets)
+                    optimizer.zero_grad()
+                    batch_size = inputs.size(0)
+                    loss.backward()
+                    optimizer.step()
+                    step += 1
+                    tq.update(batch_size)
+                    losses.append(loss.item())
+                    mean_loss = np.mean(losses[-report_each:])
+                    tq.set_postfix(loss='{:.5f}'.format(mean_loss))
+                    if i and i % report_each == 0:
+                        write_event(log, step, loss=mean_loss)
 
-            input_classes=inputs.data.cpu().numpy()
-            output_classes = outputs.data.cpu().numpy().argmax(axis=1)
-            target_classes = targets.data.cpu().numpy()
-            plt.figure()
-            plt.subplot(131)
-            plt.imshow(output_classes[0], cmap='gray')
-            plt.subplot(132)
-            plt.imshow(target_classes[0], cmap='gray')
-            plt.subplot(133)
-            plt.imshow(input_classes[0][0],cmap='gray')
-            plt.show()
-            plt.savefig('1.png')
+            # input_classes=inputs.data.cpu().numpy()
+            # output_classes = outputs.data.cpu().numpy().argmax(axis=1)
+            # target_classes = targets.data.cpu().numpy()
+            # plt.figure()
+            # plt.subplot(131)
+            # plt.imshow(output_classes[0], cmap='gray')
+            # plt.subplot(132)
+            # plt.imshow(target_classes[0], cmap='gray')
+            # plt.subplot(133)
+            # plt.imshow(input_classes[0][0],cmap='gray')
+            # plt.show()
+            # plt.savefig('1.png')
 
             write_event(log, step, loss=mean_loss)
             tq.close()
