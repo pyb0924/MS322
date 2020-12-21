@@ -156,16 +156,16 @@ def validation_all(model: nn.Module, criterion, valid_loader, num_classes):
                 for cls, iou in enumerate(calculate_iou(confusion_matrix_parts))}
         dices_parts = {'iou_{}'.format(cls + 1): iou
                       for cls, iou in enumerate(calculate_dice(confusion_matrix_parts))}
-        iou_parts=np.nanmean(list(ious_parts))
-        dice_parts=np.nanmean(list(dices_parts))
+        iou_parts=np.nanmean(list(ious_parts.values()))
+        dice_parts=np.nanmean(list(dices_parts.values()))
 
         ious_instruments = {'iou_{}'.format(cls + 1): iou
                       for cls, iou in enumerate(calculate_iou(confusion_matrix_instruments))}
 
         dices_instruments = {'iou_{}'.format(cls + 1): iou
                        for cls, iou in enumerate(calculate_dice(confusion_matrix_instruments))}
-        iou_instruments = np.nanmean(list(ious_instruments))
-        dice_instruments = np.nanmean(list(dices_instruments))
+        iou_instruments = np.nanmean(list(ious_instruments.values()))
+        dice_instruments = np.nanmean(list(dices_instruments.values()))
 
         metrics = {
             'valid_loss': valid_loss,
@@ -175,7 +175,7 @@ def validation_all(model: nn.Module, criterion, valid_loader, num_classes):
         }
 
         print(
-            'Valid loss: {:.4f}, IoU_binary: {:.4f}, IoU_parts: {:.4f}, IoU_instruments'.format(
+            'Valid loss: {:.4f}, IoU_binary: {:.4f}, IoU_parts: {:.4f}, IoU_instruments: {:.4f}'.format(
                 valid_loss,iou_binary,iou_parts,iou_instruments)
         )
         return metrics

@@ -64,16 +64,17 @@ class LossAll:
             self.nll_weight = None
         self.jaccard_weight = jaccard_weight
         self.num_classes = num_classes
-        self.alpha=alpha
-        self.beta=beta
-        self.gamma=gamma
-    def __call__(self, output_binary, target_binary,output_parts,target_parts,output_instruments,target_instruments):
-        loss1=LossBinary(jaccard_weight=self.jaccard_weight)
-        loss_binary=loss1(output_binary,target_binary)
-        loss2=LossMulti(self.jaccard_weight,self.nll_weight,4)
-        loss_parts=loss2(output_parts,target_parts)
-        loss3=LossMulti(self.jaccard_weight,self.nll_weight,8)
-        loss_instruments=loss3(output_instruments,target_instruments)
-        loss = self.alpha*loss_binary+self.beta+loss_parts+self.gamma*loss_instruments
-        return loss
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
 
+    def __call__(self, output_binary, target_binary, output_parts, target_parts, output_instruments,
+                 target_instruments):
+        loss1 = LossBinary(jaccard_weight=self.jaccard_weight)
+        loss_binary = loss1(output_binary, target_binary)
+        loss2 = LossMulti(num_classes=4, jaccard_weight=self.jaccard_weight, class_weights=self.nll_weight)
+        loss_parts = loss2(output_parts, target_parts)
+        loss3 = LossMulti(num_classes=8, jaccard_weight=self.jaccard_weight, class_weights=self.nll_weight)
+        loss_instruments = loss3(output_instruments, target_instruments)
+        loss = self.alpha * loss_binary + self.beta + loss_parts + self.gamma * loss_instruments
+        return loss

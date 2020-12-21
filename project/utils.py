@@ -96,7 +96,7 @@ def train(args, model, criterion, train_loader, valid_loader, validation, init_o
                         targets_parts=cuda(targets_parts)
                         targets_instruments=cuda(targets_instruments)
                     outputs_binary,outputs_parts,outputs_instruments = model(inputs)
-                    print(outputs_binary.shape,targets_binary.shape)
+                    #print(outputs_binary.shape,targets_binary.shape)
                     loss = criterion(outputs_binary, targets_binary,outputs_parts,targets_parts,outputs_instruments,targets_instruments)
                     optimizer.zero_grad()
                     batch_size = inputs.size(0)

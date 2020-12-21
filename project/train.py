@@ -42,10 +42,10 @@ def main():
     arg = parser.add_argument
     arg('--jaccard-weight', default=0.3, type=float)
     arg('--device-ids', type=str, default='0', help='For example 0,1 to run on two GPUs')
-    arg('--fold', type=int, help='fold', default=0)
+    arg('--fold', type=int, help='fold', default=1)
     arg('--root', default='runs/debug', help='checkpoint root')
     arg('--batch-size', type=int, default=8)
-    arg('--n-epochs', type=int, default=100)
+    arg('--n-epochs', type=int, default=5)
     arg('--lr', type=float, default=0.0001)
     arg('--workers', type=int, default=1)
     arg('--train_crop_height', type=int, default=512)
@@ -55,9 +55,9 @@ def main():
     arg('--type', type=str, default='binary', choices=['binary', 'parts', 'instruments', 'all'])
     arg('--model', type=str, default='UNet11', choices=moddel_list.keys())
     arg('--ends-flag', type=int, default=0)
-    arg('--alpha', default=0.2, type=float)
-    arg('--beta', default=0.4, type=float)
-    arg('--gamma', default=0.2, type=float)
+    arg('--alpha', default=0.3, type=float)
+    arg('--beta', default=0.2, type=float)
+    arg('--gamma', default=0.5, type=float)
 
     args = parser.parse_args()
 
@@ -108,7 +108,7 @@ def main():
         class_weight = np.array([0.1, 0.05, 0.05, 0.2, 0.2, 0.2, 0.1, 0.1], dtype=np.float32)
         loss = LossMulti(num_classes=num_classes, jaccard_weight=args.jaccard_weight, class_weights=class_weight)
     elif args.type == 'all':
-        class_weight = np.array([0.1, 0.05, 0.05, 0.2, 0.2, 0.2, 0.1, 0.1], dtype=np.float32)
+        class_weight = None
         loss = LossAll(args.alpha, args.beta, args.gamma, num_classes=num_classes, jaccard_weight=args.jaccard_weight,
                        class_weights=class_weight)
 

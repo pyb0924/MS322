@@ -1,0 +1,15 @@
+cropped_train/
+submit/
+raw_data/
+.idea/
+.vscode/
+__pycache__/
+
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.pptx

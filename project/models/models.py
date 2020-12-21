@@ -575,16 +575,25 @@ class TDSNet(nn.Module):
 
         self.center = CEBlock(512)
 
-        self.dec11 = DecoderBlock(512, 64, 32)
-        self.dec12 = ConvRelu(32, 32)
+        self.dec11 = DecoderBlock(768, 512, 256)
+        self.dec12 = DecoderBlock(768, 512, 256)
+        self.dec13 = DecoderBlock(512, 256, 64)
+        self.dec14 = DecoderBlock(192, 96, 32)
+        self.dec15 = ConvRelu(96, 32)
         self.final1 = nn.Conv2d(32, 1, kernel_size=1)
 
-        self.dec21 = DecoderBlock(512, 64, 32)
-        self.dec22 = ConvRelu(32, 32)
+        self.dec21 = DecoderBlock(768, 512, 256)
+        self.dec22 = DecoderBlock(768, 512, 256)
+        self.dec23 = DecoderBlock(512, 256, 64)
+        self.dec24 = DecoderBlock(192, 96, 32)
+        self.dec25 = ConvRelu(96, 32)
         self.final2 = nn.Conv2d(32, 4, kernel_size=1)
 
-        self.dec31 = DecoderBlock(512, 64, 32)
-        self.dec32 = ConvRelu(32, 32)
+        self.dec31 = DecoderBlock(768, 512, 256)
+        self.dec32 = DecoderBlock(768, 512, 256)
+        self.dec33 = DecoderBlock(512, 256, 64)
+        self.dec34 = DecoderBlock(192, 96, 32)
+        self.dec35 = ConvRelu(96, 32)
         self.final3 = nn.Conv2d(32, 8, kernel_size=1)
 
     def forward(self, x):
@@ -595,17 +604,25 @@ class TDSNet(nn.Module):
         conv5 = self.conv5(self.pool(conv4))
 
         center0_1, center0_2, center1_2 = self.center(self.pool(conv5))
+        dec1 = self.dec11(torch.cat([center0_1, conv5], 1))
+        dec1 = self.dec12(torch.cat([dec1, conv4], 1))
+        dec1 = self.dec13(torch.cat([dec1, conv3], 1))
+        dec1 = self.dec14(torch.cat([dec1, conv2], 1))
+        dec1 = self.dec15(torch.cat([dec1, conv1], 1))
+        out_binary = self.final1(dec1)
 
-        dec1 = self.dec11(torch.cat([center0_1, center0_2], 1))
-        dec1 = self.dec12(dec1)
-        out_binary = F.log_softmax(self.final1(dec1),dim=1)
-
-        dec2 = self.dec21(torch.cat([center0_1, center1_2], 1))
-        dec2 = self.dec22(dec2)
+        dec2 = self.dec11(torch.cat([center0_2, conv5], 1))
+        dec2 = self.dec12(torch.cat([dec2, conv4], 1))
+        dec2 = self.dec13(torch.cat([dec2, conv3], 1))
+        dec2 = self.dec14(torch.cat([dec2, conv2], 1))
+        dec2 = self.dec15(torch.cat([dec2, conv1], 1))
         out_parts = F.log_softmax(self.final2(dec2), dim=1)
 
-        dec3 = self.dec31(torch.cat([center0_2, center1_2], 1))
-        dec3 = self.dec32(dec3)
+        dec3 = self.dec11(torch.cat([center1_2, conv5], 1))
+        dec3 = self.dec12(torch.cat([dec3, conv4], 1))
+        dec3 = self.dec13(torch.cat([dec3, conv3], 1))
+        dec3 = self.dec14(torch.cat([dec3, conv2], 1))
+        dec3 = self.dec15(torch.cat([dec3, conv1], 1))
         out_instruments = F.log_softmax(self.final3(dec3), dim=1)
 
         return out_binary, out_parts, out_instruments

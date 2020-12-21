@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     df=df.groupby([df['model'],df['problem-type']]).mean()
 
-    col = ['valid_loss', 'iou', 'dice']
+    col = ['valid_loss', 'iou', 'dice','iou_binary','iou_parts','iou_instruments']
     df = df[col]
 
     df.to_csv('result.csv')
