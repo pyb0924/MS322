@@ -91,6 +91,7 @@ if __name__ == '__main__':
                 image = cuda(image)
                 output_binary, output_parts, output_instruments = model(image)
 
+
                 output_binary = (output_binary > 0).float()
                 output_binary = output_binary.data.cpu().numpy()
                 output_binary = output_binary[0][0]
